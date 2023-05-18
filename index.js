@@ -74,16 +74,13 @@ app.get('/login', (req, res) => {
     const message = req.flash('message')[0];
     res.render('login', { message });
 });
+app.post('/login', async (req, res) => {
 
-
-
-app.post('/login', (req, res) => {
-    const { email, password } = req.body;
-    User.findOne({ email }, (err, user) => {
-        if (err) {
-            req.flash('message', 'An error occurred');
-            res.redirect('/login');
-        } else if (!user) {
+    try{
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        
+        if (!user) {
             req.flash('message', 'Email or password is incorrect');
             res.redirect('/login');
         } else {
@@ -97,8 +94,14 @@ app.post('/login', (req, res) => {
                 }
             });
         }
-    });
+
+    } catch(err) {
+        req.flash('message', 'An error occurred');
+        res.redirect('/login');
+    }
+
 });
+
 
 app.get('/reset-password', (req, res) => {
     const { token } = req.params;
